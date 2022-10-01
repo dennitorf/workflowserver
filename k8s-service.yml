@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: workflow-server
+  name: workflow-server
+  namespace: default
+spec:
+  ports:
+  - name: workflow-server
+    port: 80
+    targetPort: service-port
+    protocol: TCP
+  selector:
+    component: workflow-server

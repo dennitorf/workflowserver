@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: workflow-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: workflow-server
+  template:
+    metadata:
+      labels:
+        component: workflow-server
+    spec:
+      containers:
+        - name: workflow-server
+          image: hub.docker.com/workflow-server:{BUILD_NO}
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
