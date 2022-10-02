@@ -43,7 +43,10 @@ public class WorkflowActionExcutionCommandHandler : IRequestHandler<WorkflowActi
         if (workflowActionExecution == null)
             throw new NotFoundException(nameof(WorkflowExecutionDetail), request.WorkflowExecutionDetailId);
 
-        var commandType = Assembly.GetExecutingAssembly().GetType(workflowActionExecution.WorkflowAction.Action.WorkflowActionHandler);
+        var commandType = Assembly.GetExecutingAssembly()
+            .GetTypes()
+            .Where(c => c.Name == workflowActionExecution.WorkflowAction.Action.WorkflowActionHandler)
+            .FirstOrDefault();
 
         var command = JsonConvert.DeserializeObject(workflowActionExecution.InputEntity, commandType);
         try 
