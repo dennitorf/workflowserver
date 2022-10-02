@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Cudataware.WorkflowServer.Domain.Common;
 
 namespace Cudataware.WorkflowServer.Domain.Entities.Workflow;
@@ -10,4 +11,5 @@ public class Action : BaseEntity
     public string EntityInputType { set; get; }
     public string EntityOutputType { set; get; }
     public string WorkflowActionHandler {set; get;}
+    public virtual ICollection<WorkflowAction> WorkflowActions {set; get;}
 }

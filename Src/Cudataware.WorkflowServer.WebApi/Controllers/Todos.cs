@@ -1,5 +1,6 @@
 ﻿using Cudataware.WorkflowServer.Application.Features.Todos.Commands.CreateTodo;
 using Cudataware.WorkflowServer.Application.Features.Todos.Commands.DeleteTodo;
+using Cudataware.WorkflowServer.Application.Features.Todos.Commands.RequestTodoApproval;
 using Cudataware.WorkflowServer.Application.Features.Todos.Commands.UpdateTodo;
 using Cudataware.WorkflowServer.Application.Features.Todos.Queries.GetAllTodos;
 using Cudataware.WorkflowServer.Application.Features.Todos.Queries.GetTodo;
@@ -47,8 +48,15 @@ namespace Cudataware.WorkflowServer.WebApi.Controllers
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
             await Mediator.Send(new DeleteTodoCommand() { Id = id });
+            return NoContent();            
+        }
+
+        [HttpPost("{id}/submit-for-approval")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> SubmitForApproval(RequestTodoApprovalCommand command)
+        {
+            await Mediator.Send(command);
             return NoContent();
-            
         }
     }
 }

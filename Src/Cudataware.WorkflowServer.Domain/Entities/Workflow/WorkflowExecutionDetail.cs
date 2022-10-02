@@ -11,4 +11,6 @@ public class WorkflowExecutionDetail : BaseEntity
     public bool Executed {set; get; } 
     public WorkflowExecution WorkflowExecution {set; get;}
     public int WorkflowExecutionId {set; get;}
+    public WorkflowAction WorkflowAction {set; get;}
+    public int WorkflowActionId {set; get;}
 }

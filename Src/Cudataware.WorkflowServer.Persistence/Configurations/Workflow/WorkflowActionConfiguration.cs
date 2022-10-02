@@ -23,7 +23,13 @@ public class WorkflowActionConfiguration : IEntityTypeConfiguration<WorkflowActi
 
         builder.HasOne<Cudataware.WorkflowServer.Domain.Entities.Workflow.Workflow>(c => c.Workflow)
             .WithMany(c => c.Actions)
-            .HasForeignKey(c => c.WorkflowId);                             
+            .HasForeignKey(c => c.WorkflowId)
+            .OnDelete(DeleteBehavior.Restrict);                             
+
+        builder.HasOne<Action>(c => c.Action)
+            .WithMany(c => c.WorkflowActions)
+            .HasForeignKey(c => c.ActionId)
+            .OnDelete(DeleteBehavior.Restrict);                             
 
         builder.ToTable("WorkflowAction");
     }

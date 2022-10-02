@@ -25,6 +25,7 @@ public class WorkflowExecutionConfiguration : IEntityTypeConfiguration<WorkflowE
 
         builder.HasOne<Cudataware.WorkflowServer.Domain.Entities.Workflow.Workflow>()
             .WithMany(c => c.Executions)
-            .HasForeignKey(c => c.WorkflowId);
+            .HasForeignKey(c => c.WorkflowId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }
