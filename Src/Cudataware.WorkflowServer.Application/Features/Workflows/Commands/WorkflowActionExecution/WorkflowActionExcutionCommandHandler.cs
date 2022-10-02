@@ -54,28 +54,31 @@ public class WorkflowActionExcutionCommandHandler : IRequestHandler<WorkflowActi
             var result = await mediator.Send(command);
             var resultSerialized = JsonConvert.SerializeObject(result);
 
-            if (!workflowActionExecution.WorkflowAction.LastAction) 
-            {
-                var nextWorkflowActionExecution = mapper.Map<WorkflowExecutionDetail>(workflowActionExecution);
-                nextWorkflowActionExecution.WorkflowActionId  = workflowActionExecution.WorkflowAction.NextAction;
-                nextWorkflowActionExecution.InputEntity = resultSerialized;
-                workflowActionExecution.ReadyToExecute = true;
-                workflowActionExecution.Executed = false;
-
-                await db.WorkflowExecutionDetails.AddAsync(nextWorkflowActionExecution);
-                await db.SaveChangesAsync(cancellationToken);
-            }
-
             workflowActionExecution.OuputEntity = resultSerialized;
             workflowActionExecution.Executed = true;
-
             db.WorkflowExecutionDetails.Update(workflowActionExecution);
-
             await db.SaveChangesAsync(cancellationToken);
 
+            if (!workflowActionExecution.WorkflowAction.LastAction) 
+            {
+                var nextWorkflowActionExecution = new WorkflowExecutionDetail() 
+                {
+                    WorkflowActionId = workflowActionExecution.WorkflowAction.NextAction,   
+                    WorkflowExecutionId = workflowActionExecution.WorkflowExecutionId,         
+                    CorrelationId = 1,
+                    InputEntity = resultSerialized,
+                    ReadyToExecute = true,
+                    Executed = false,
+                    IsActive = true                    
+                };
+                
+                await db.WorkflowExecutionDetails.AddAsync(nextWorkflowActionExecution);
+                await db.SaveChangesAsync(cancellationToken);
+            }                        
         }
         catch (Exception e)
         {
+            logger.LogError("Error while executing workflow action: {message} {stackTrace}", e.Message, e.StackTrace);
             throw e;
         }
 

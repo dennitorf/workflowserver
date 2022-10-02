@@ -30,7 +30,7 @@ public class WorkflowExecutionDetailConfiguration : IEntityTypeConfiguration<Wor
 
         builder.HasOne<WorkflowAction>(c => c.WorkflowAction)
             .WithMany(c => c.WorkflowExecutionDetails)
-            .HasForeignKey(c => c.WorkflowExecutionId)
+            .HasForeignKey(c => c.WorkflowActionId)
             .OnDelete(DeleteBehavior.Restrict);        
     }
 }
