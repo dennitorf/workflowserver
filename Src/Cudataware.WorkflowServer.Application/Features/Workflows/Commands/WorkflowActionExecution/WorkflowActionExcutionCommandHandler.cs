@@ -45,7 +45,7 @@ public class WorkflowActionExcutionCommandHandler : IRequestHandler<WorkflowActi
 
         var commandType = Assembly.GetExecutingAssembly()
             .GetTypes()
-            .Where(c => c.Name == workflowActionExecution.WorkflowAction.Action.WorkflowActionHandler)
+            .Where(c => c.Name == workflowActionExecution.WorkflowAction.Action.WorkflowActionName)
             .FirstOrDefault();
 
         var command = JsonConvert.DeserializeObject(workflowActionExecution.InputEntity, commandType);
@@ -63,6 +63,7 @@ public class WorkflowActionExcutionCommandHandler : IRequestHandler<WorkflowActi
                 workflowActionExecution.Executed = false;
 
                 await db.WorkflowExecutionDetails.AddAsync(nextWorkflowActionExecution);
+                await db.SaveChangesAsync(cancellationToken);
             }
 
             workflowActionExecution.OuputEntity = resultSerialized;

@@ -49,24 +49,28 @@ public class StartWorkflowExecutionCommandHandler : IRequestHandler<StartWorkflo
             WorkflowId = request.WorkflowId,
             CorrelationId = 1,
             EntityId = request.EntityId,
-            IsActive = true,
-            WorkflowExecutionDetails = new List<WorkflowExecutionDetail> () 
-            {
-                new WorkflowExecutionDetail() 
-                {
-                    WorkflowActionId = firstAction.Id,
-                    CorrelationId = 1,
-                    InputEntity = JsonConvert.SerializeObject(new  { Id = request.EntityId }),
-                    ReadyToExecute = true,
-                    Executed = false,
-                    IsActive = true                    
-                }
-            }
+            IsActive = true      
         };
 
         await db.WorkflowExecutions.AddAsync(workflowExecution);
         await db.SaveChangesAsync(cancellationToken);
 
+         
+            
+        var workflowExecutionDetail = new WorkflowExecutionDetail() 
+        {
+            WorkflowActionId = firstAction.Id,
+            WorkflowExecutionId = workflowExecution.Id,
+            CorrelationId = 1,
+            InputEntity = JsonConvert.SerializeObject(new  { Id = request.EntityId }),
+            ReadyToExecute = true,
+            Executed = false,
+            IsActive = true                    
+        };
+
+        await db.WorkflowExecutionDetails.AddAsync(workflowExecutionDetail);
+        await db.SaveChangesAsync(cancellationToken);
+                    
         return Unit.Task.Result;
     }
 }
