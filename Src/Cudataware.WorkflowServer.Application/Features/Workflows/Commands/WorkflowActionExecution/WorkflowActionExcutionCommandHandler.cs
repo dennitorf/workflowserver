@@ -21,7 +21,15 @@ public class WorkflowActionExcutionCommandHandler : IRequestHandler<WorkflowActi
     private AppDbContext db;    
     private IMapper mapper;
     private ILogger logger;
-    
+
+    public WorkflowActionExcutionCommandHandler(IMediator mediator, AppDbContext db, IMapper mapper, ILogger<WorkflowActionExcutionCommandHandler> logger)
+    {
+        this.mediator = mediator;
+        this.db = db;
+        this.mapper = mapper;
+        this.logger = logger;
+    }
+
     public async Task<Unit> Handle(WorkflowActionExecutionCommand request, CancellationToken cancellationToken)
     {
         var workflowActionExecution = await db
