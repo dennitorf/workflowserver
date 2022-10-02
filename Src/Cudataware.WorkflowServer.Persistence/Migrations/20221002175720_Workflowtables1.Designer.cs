@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Cudataware.WorkflowServer.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20221002003718_WorkflowTables1")]
-    partial class WorkflowTables1
+    [Migration("20221002175720_Workflowtables1")]
+    partial class Workflowtables1
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -149,6 +149,9 @@ namespace Cudataware.WorkflowServer.Persistence.Migrations
                     b.Property<string>("WorkflowActionHandler")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("WorkflowActionName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.ToTable("Action", (string)null);
@@ -197,6 +200,9 @@ namespace Cudataware.WorkflowServer.Persistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<int>("ActionId")
+                        .HasColumnType("int");
+
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -229,6 +235,8 @@ namespace Cudataware.WorkflowServer.Persistence.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ActionId");
 
                     b.HasIndex("WorkflowId");
 
@@ -273,7 +281,7 @@ namespace Cudataware.WorkflowServer.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("WorkflowParameters", (string)null);
+                    b.ToTable("WorkflowConfiguration", (string)null);
                 });
 
             modelBuilder.Entity("Cudataware.WorkflowServer.Domain.Entities.Workflow.WorkflowExecution", b =>
@@ -315,14 +323,9 @@ namespace Cudataware.WorkflowServer.Persistence.Migrations
                     b.Property<int>("WorkflowId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("WorkflowId1")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("WorkflowId");
-
-                    b.HasIndex("WorkflowId1");
 
                     b.ToTable("WorkflowExecution", (string)null);
                 });
@@ -369,6 +372,9 @@ namespace Cudataware.WorkflowServer.Persistence.Migrations
                     b.Property<bool>("ReadyToExecute")
                         .HasColumnType("bit");
 
+                    b.Property<int>("WorkflowActionId")
+                        .HasColumnType("int");
+
                     b.Property<int>("WorkflowExecutionId")
                         .HasColumnType("int");
 
@@ -392,37 +398,49 @@ namespace Cudataware.WorkflowServer.Persistence.Migrations
 
             modelBuilder.Entity("Cudataware.WorkflowServer.Domain.Entities.Workflow.WorkflowAction", b =>
                 {
+                    b.HasOne("Cudataware.WorkflowServer.Domain.Entities.Workflow.Action", "Action")
+                        .WithMany("WorkflowActions")
+                        .HasForeignKey("ActionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("Cudataware.WorkflowServer.Domain.Entities.Workflow.Workflow", "Workflow")
                         .WithMany("Actions")
                         .HasForeignKey("WorkflowId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Action");
 
                     b.Navigation("Workflow");
                 });
 
             modelBuilder.Entity("Cudataware.WorkflowServer.Domain.Entities.Workflow.WorkflowExecution", b =>
                 {
-                    b.HasOne("Cudataware.WorkflowServer.Domain.Entities.Workflow.Workflow", null)
-                        .WithMany("Executions")
+                    b.HasOne("Cudataware.WorkflowServer.Domain.Entities.Workflow.Workflow", "Workflow")
+                        .WithMany()
                         .HasForeignKey("WorkflowId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("Cudataware.WorkflowServer.Domain.Entities.Workflow.Workflow", "Workflow")
-                        .WithMany()
-                        .HasForeignKey("WorkflowId1");
 
                     b.Navigation("Workflow");
                 });
 
             modelBuilder.Entity("Cudataware.WorkflowServer.Domain.Entities.Workflow.WorkflowExecutionDetail", b =>
                 {
+                    b.HasOne("Cudataware.WorkflowServer.Domain.Entities.Workflow.WorkflowAction", "WorkflowAction")
+                        .WithMany("WorkflowExecutionDetails")
+                        .HasForeignKey("WorkflowExecutionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("Cudataware.WorkflowServer.Domain.Entities.Workflow.WorkflowExecution", "WorkflowExecution")
                         .WithMany("WorkflowExecutionDetails")
                         .HasForeignKey("WorkflowExecutionId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("WorkflowAction");
 
                     b.Navigation("WorkflowExecution");
                 });
@@ -432,11 +450,19 @@ namespace Cudataware.WorkflowServer.Persistence.Migrations
                     b.Navigation("TodoItems");
                 });
 
+            modelBuilder.Entity("Cudataware.WorkflowServer.Domain.Entities.Workflow.Action", b =>
+                {
+                    b.Navigation("WorkflowActions");
+                });
+
             modelBuilder.Entity("Cudataware.WorkflowServer.Domain.Entities.Workflow.Workflow", b =>
                 {
                     b.Navigation("Actions");
+                });
 
-                    b.Navigation("Executions");
+            modelBuilder.Entity("Cudataware.WorkflowServer.Domain.Entities.Workflow.WorkflowAction", b =>
+                {
+                    b.Navigation("WorkflowExecutionDetails");
                 });
 
             modelBuilder.Entity("Cudataware.WorkflowServer.Domain.Entities.Workflow.WorkflowExecution", b =>

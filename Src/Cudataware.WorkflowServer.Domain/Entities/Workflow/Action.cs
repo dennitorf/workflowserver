@@ -10,6 +10,7 @@ public class Action : BaseEntity
     public bool Automatic { set; get; } 
     public string EntityInputType { set; get; }
     public string EntityOutputType { set; get; }
+    public string WorkflowActionName {set; get;}
     public string WorkflowActionHandler {set; get;}
     public virtual ICollection<WorkflowAction> WorkflowActions {set; get;}
 }

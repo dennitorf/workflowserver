@@ -147,6 +147,9 @@ namespace Cudataware.WorkflowServer.Persistence.Migrations
                     b.Property<string>("WorkflowActionHandler")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("WorkflowActionName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.ToTable("Action", (string)null);
@@ -276,7 +279,7 @@ namespace Cudataware.WorkflowServer.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("WorkflowParameters", (string)null);
+                    b.ToTable("WorkflowConfiguration", (string)null);
                 });
 
             modelBuilder.Entity("Cudataware.WorkflowServer.Domain.Entities.Workflow.WorkflowExecution", b =>
@@ -318,14 +321,9 @@ namespace Cudataware.WorkflowServer.Persistence.Migrations
                     b.Property<int>("WorkflowId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("WorkflowId1")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("WorkflowId");
-
-                    b.HasIndex("WorkflowId1");
 
                     b.ToTable("WorkflowExecution", (string)null);
                 });
@@ -417,15 +415,11 @@ namespace Cudataware.WorkflowServer.Persistence.Migrations
 
             modelBuilder.Entity("Cudataware.WorkflowServer.Domain.Entities.Workflow.WorkflowExecution", b =>
                 {
-                    b.HasOne("Cudataware.WorkflowServer.Domain.Entities.Workflow.Workflow", null)
-                        .WithMany("Executions")
-                        .HasForeignKey("WorkflowId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("Cudataware.WorkflowServer.Domain.Entities.Workflow.Workflow", "Workflow")
                         .WithMany()
-                        .HasForeignKey("WorkflowId1");
+                        .HasForeignKey("WorkflowId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Workflow");
                 });
@@ -462,8 +456,6 @@ namespace Cudataware.WorkflowServer.Persistence.Migrations
             modelBuilder.Entity("Cudataware.WorkflowServer.Domain.Entities.Workflow.Workflow", b =>
                 {
                     b.Navigation("Actions");
-
-                    b.Navigation("Executions");
                 });
 
             modelBuilder.Entity("Cudataware.WorkflowServer.Domain.Entities.Workflow.WorkflowAction", b =>

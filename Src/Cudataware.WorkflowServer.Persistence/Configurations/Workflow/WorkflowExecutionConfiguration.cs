@@ -21,11 +21,6 @@ public class WorkflowExecutionConfiguration : IEntityTypeConfiguration<WorkflowE
             .IsRequired(true)
             .HasDefaultValueSql("GETDATE()");
 
-        builder.ToTable("WorkflowExecution");
-
-        builder.HasOne<Cudataware.WorkflowServer.Domain.Entities.Workflow.Workflow>()
-            .WithMany(c => c.Executions)
-            .HasForeignKey(c => c.WorkflowId)
-            .OnDelete(DeleteBehavior.Restrict);
+        builder.ToTable("WorkflowExecution"); 
     }
 }

@@ -40,10 +40,12 @@ public class WorkflowExecutionCommandHandler : IRequestHandler<WorkflowExecution
             {
                 if (configuration.WorkflowBackgroungJobEnable)
                 {
-                    var workflowActionInstancesReadyToExecute = db
+                    var workflowActionInstancesReadyToExecute = await db
                         .WorkflowExecutionDetails                        
                         .Where(c => c.ReadyToExecute && !c.Executed)
-                        .AsNoTracking();
+                        .Take(configuration.ConcurrentMaxExecutions)
+                        .AsNoTracking()
+                        .ToListAsync();
                         
                     foreach (var workflowAction in workflowActionInstancesReadyToExecute)
                     {

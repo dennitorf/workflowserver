@@ -21,6 +21,6 @@ public class WorkflowConfigurationConfiguration : IEntityTypeConfiguration<Cudat
             .IsRequired(true)
             .HasDefaultValueSql("GETDATE()");                    
 
-        builder.ToTable("WorkflowParameters");
+        builder.ToTable("WorkflowConfiguration");
     }
 }
