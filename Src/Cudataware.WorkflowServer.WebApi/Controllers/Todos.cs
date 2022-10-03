@@ -1,4 +1,5 @@
-﻿using Cudataware.WorkflowServer.Application.Features.Todos.Commands.CreateTodo;
+﻿using Cudataware.WorkflowServer.Application.Features.Todos.Commands.ConfirmTodo;
+using Cudataware.WorkflowServer.Application.Features.Todos.Commands.CreateTodo;
 using Cudataware.WorkflowServer.Application.Features.Todos.Commands.DeleteTodo;
 using Cudataware.WorkflowServer.Application.Features.Todos.Commands.RequestTodoApproval;
 using Cudataware.WorkflowServer.Application.Features.Todos.Commands.UpdateTodo;
@@ -57,6 +58,13 @@ namespace Cudataware.WorkflowServer.WebApi.Controllers
         {
             await Mediator.Send(command);
             return NoContent();
+        }
+
+        [HttpPost("{id}/confirm")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> ConfirmTodo(ConfirmTodoCommand command)
+        {            
+            return Ok(await Mediator.Send(command));
         }
     }
 }

@@ -41,7 +41,9 @@ public class WorkflowExecutionCommandHandler : IRequestHandler<WorkflowExecution
                 if (configuration.WorkflowBackgroungJobEnable)
                 {
                     var workflowActionInstancesReadyToExecute = await db
-                        .WorkflowExecutionDetails                        
+                        .WorkflowExecutionDetails 
+                        .Include(c => c.WorkflowAction)
+                        .ThenInclude(c => c.Action)                       
                         .Where(c => c.ReadyToExecute && !c.Executed)
                         .Take(configuration.ConcurrentMaxExecutions)
                         .AsNoTracking()
@@ -49,7 +51,8 @@ public class WorkflowExecutionCommandHandler : IRequestHandler<WorkflowExecution
                         
                     foreach (var workflowAction in workflowActionInstancesReadyToExecute)
                     {
-                        await mediator.Send(new WorkflowActionExecutionCommand() { WorkflowExecutionDetailId = workflowAction.Id });
+                        if (workflowAction.WorkflowAction.Action.Automatic)
+                            await mediator.Send(new WorkflowActionExecutionCommand() { WorkflowExecutionDetailId = workflowAction.Id });
                     }
                     
                 }

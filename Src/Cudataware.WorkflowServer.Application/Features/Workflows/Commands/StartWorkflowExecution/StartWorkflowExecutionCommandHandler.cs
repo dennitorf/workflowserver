@@ -46,8 +46,7 @@ public class StartWorkflowExecutionCommandHandler : IRequestHandler<StartWorkflo
 
         var workflowExecution = new Cudataware.WorkflowServer.Domain.Entities.Workflow.WorkflowExecution() 
         {
-            WorkflowId = request.WorkflowId,
-            CorrelationId = 1,
+            WorkflowId = request.WorkflowId,            
             EntityId = request.EntityId,
             IsActive = true,
             WorkflowExecutionDetails = new List<WorkflowExecutionDetail>() 

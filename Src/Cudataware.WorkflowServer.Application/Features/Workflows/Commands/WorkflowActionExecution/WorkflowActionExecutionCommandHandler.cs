@@ -47,12 +47,18 @@ public class WorkflowActionExcutionCommandHandler : IRequestHandler<WorkflowActi
             .GetTypes()
             .Where(c => c.Name == workflowActionExecution.WorkflowAction.Action.WorkflowActionName)
             .FirstOrDefault();
-
-        var command = JsonConvert.DeserializeObject(workflowActionExecution.InputEntity, commandType);
+        
         try 
         {
-            var result = await mediator.Send(command);
-            var resultSerialized = JsonConvert.SerializeObject(result);
+            var command = JsonConvert.DeserializeObject(workflowActionExecution.InputEntity, commandType);
+            
+            string resultSerialized = request.ResultFromManualAction;
+
+            if (workflowActionExecution.WorkflowAction.Action.Automatic) 
+            {
+                var result = await mediator.Send(command);
+                resultSerialized = JsonConvert.SerializeObject(result);
+            }
 
             workflowActionExecution.OuputEntity = resultSerialized;
             workflowActionExecution.Executed = true;

@@ -2,7 +2,7 @@ using System;
 
 namespace Cudataware.WorkflowServer.Application.Common.Workflow.Attributes;
 
-public class ActionAttribute : Attribute
+public class WfActionAttribute : Attribute
 {
     public string Code {set; get;}
     public string Description {set; get;}
