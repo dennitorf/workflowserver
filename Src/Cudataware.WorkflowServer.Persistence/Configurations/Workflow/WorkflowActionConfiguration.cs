@@ -29,7 +29,10 @@ public class WorkflowActionConfiguration : IEntityTypeConfiguration<WorkflowActi
         builder.HasOne<Action>(c => c.Action)
             .WithMany(c => c.WorkflowActions)
             .HasForeignKey(c => c.ActionId)
-            .OnDelete(DeleteBehavior.Restrict);                             
+            .OnDelete(DeleteBehavior.Restrict);    
+
+        builder.Property(c => c.ActionMetadata)
+            .IsRequired(false);                        
 
         builder.ToTable("WorkflowAction");
     }

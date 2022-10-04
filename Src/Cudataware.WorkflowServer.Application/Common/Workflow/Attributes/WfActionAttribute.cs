@@ -10,4 +10,5 @@ public class WfActionAttribute : Attribute
     public string EntityInputType {set; get;} 
     public string EntityOutputType { set; get; }
     public string WorkflowActionHandler {set; get;}
+    public bool FlowControlAction {set; get;}
 }

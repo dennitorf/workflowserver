@@ -8,6 +8,8 @@ public class WorkflowAction : BaseEntity
     public bool FirstAction {set ; get; }
     public bool LastAction { set; get; }
     public int NextAction {set; get; }
+    public int NextSecondAction {set; get; }
+    public string ActionMetadata { set; get; }
     public Workflow Workflow {set; get;}
     public int WorkflowId {set; get;}
     public Action Action {set; get; }

@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using Cudataware.WorkflowServer.Application.Common.Exceptions;
+using Cudataware.WorkflowServer.Application.Features.Workflows.Commands.IfAction;
 using Cudataware.WorkflowServer.Domain.Entities.Workflow;
 using Cudataware.WorkflowServer.Persistence.Contexts;
 using MediatR;
@@ -56,6 +57,19 @@ public class WorkflowActionExcutionCommandHandler : IRequestHandler<WorkflowActi
 
             if (workflowActionExecution.WorkflowAction.Action.Automatic) 
             {
+                if (commandType == typeof(IfActionCommand))
+                {
+                    PropertyInfo propInput = commandType.GetProperty("Input");
+                    propInput.SetValue(command, workflowActionExecution.InputEntity);
+
+                    PropertyInfo propEntityType = commandType.GetProperty("EntityType");
+                    propEntityType.SetValue(command, workflowActionExecution.WorkflowAction.Action.EntityOutputType);
+
+                    PropertyInfo propExpression = commandType.GetProperty("Expression");
+                    propExpression.SetValue(command, workflowActionExecution.WorkflowAction.ActionMetadata);
+
+                }
+
                 var result = await mediator.Send(command);
                 resultSerialized = JsonConvert.SerializeObject(result);
             }
@@ -66,10 +80,23 @@ public class WorkflowActionExcutionCommandHandler : IRequestHandler<WorkflowActi
             await db.SaveChangesAsync(cancellationToken);
 
             if (!workflowActionExecution.WorkflowAction.LastAction) 
-            {
+            {                
+                int nextActionToExecute = workflowActionExecution.WorkflowAction.NextAction;
+
+                if (commandType == typeof(IfActionCommand))
+                {
+                    bool result = JsonConvert.DeserializeObject<bool>(resultSerialized);
+                    resultSerialized  = workflowActionExecution.InputEntity;
+                    
+                    if (!result)
+                    {
+                        nextActionToExecute = workflowActionExecution.WorkflowAction.NextSecondAction;                            
+                    }
+                }   
+
                 var nextWorkflowActionExecution = new WorkflowExecutionDetail() 
                 {
-                    WorkflowActionId = workflowActionExecution.WorkflowAction.NextAction,   
+                    WorkflowActionId = nextActionToExecute,   
                     WorkflowExecutionId = workflowActionExecution.WorkflowExecutionId,         
                     CorrelationId = 1,
                     InputEntity = resultSerialized,
