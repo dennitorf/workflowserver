@@ -57,21 +57,7 @@ public class WorkflowActionExcutionCommandHandler : IRequestHandler<WorkflowActi
 
             if (workflowActionExecution.WorkflowAction.Action.Automatic) 
             {
-                if (commandType == typeof(IfActionCommand))
-                {
-                    PropertyInfo propInput = commandType.GetProperty("Input");
-                    propInput.SetValue(command, workflowActionExecution.InputEntity);
-
-                    PropertyInfo propEntityType = commandType.GetProperty("EntityType");
-                    propEntityType.SetValue(command, workflowActionExecution.WorkflowAction.Action.EntityOutputType);
-
-                    PropertyInfo propExpression = commandType.GetProperty("Expression");
-                    propExpression.SetValue(command, workflowActionExecution.WorkflowAction.ActionMetadata);
-
-                }
-
-                var result = await mediator.Send(command);
-                resultSerialized = JsonConvert.SerializeObject(result);
+                resultSerialized = await ExecuteCommand(commandType, command, workflowActionExecution);
             }
 
             workflowActionExecution.OuputEntity = resultSerialized;
@@ -117,5 +103,35 @@ public class WorkflowActionExcutionCommandHandler : IRequestHandler<WorkflowActi
 
         return Unit.Task.Result;        
         
+    }
+
+    private async Task<string> ExecuteCommand(Type commandType, object command, WorkflowExecutionDetail workflowActionExecution)
+    {
+        try 
+        {
+            string resultSerialized = "";
+
+            if (commandType == typeof(IfActionCommand))
+            {
+                    PropertyInfo propInput = commandType.GetProperty("Input");
+                    propInput.SetValue(command, workflowActionExecution.InputEntity);
+
+                    PropertyInfo propEntityType = commandType.GetProperty("EntityType");
+                    propEntityType.SetValue(command, workflowActionExecution.WorkflowAction.Action.EntityOutputType);
+
+                    PropertyInfo propExpression = commandType.GetProperty("Expression");
+                    propExpression.SetValue(command, workflowActionExecution.WorkflowAction.ActionMetadata);
+
+            }
+
+            var result = await mediator.Send(command);
+            resultSerialized = JsonConvert.SerializeObject(result);
+
+            return resultSerialized;
+        }
+        catch (Exception e)
+        {
+            throw e;
+        }
     }
 }
